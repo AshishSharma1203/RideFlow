@@ -4,9 +4,17 @@ package identity.v1;
 
 option go_package = "rideflow/api/gen/identity/v1;identityv1";
 
+import "google/api/annotations.proto";
+
 service IdentityService {
+
   rpc HealthCheck(HealthCheckRequest)
-      returns (HealthCheckResponse);
+      returns (HealthCheckResponse) {
+
+    option (google.api.http) = {
+      get: "/health"
+    };
+  }
 }
 
 message HealthCheckRequest {}

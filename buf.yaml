@@ -1,0 +1,7 @@
+version: v2
+
+modules:
+  - path: api/proto
+
+deps:
+  - buf.build/googleapis/googleapis
