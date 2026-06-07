@@ -13,6 +13,7 @@ import (
 
 	"github.com/ashishSharma1203/rideflow/services/gateway/internal/client"
 	"github.com/ashishSharma1203/rideflow/services/gateway/internal/handler"
+	"github.com/ashishSharma1203/rideflow/services/gateway/internal/service"
 )
 
 func main() {
@@ -32,8 +33,10 @@ func main() {
 		log.Fatalf("identity client error: %v", err)
 	}
 
+	healthService := service.NewHealthService(identityClient)
+
 	healthHandler := handler.NewHealthHandler(
-		identityClient,
+		healthService,
 	)
 
 	e.GET(

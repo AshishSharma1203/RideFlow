@@ -3,31 +3,24 @@ package handler
 import (
 	"net/http"
 
-	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
-	"github.com/ashishSharma1203/rideflow/services/gateway/internal/client"
-
+	"github.com/ashishSharma1203/rideflow/services/gateway/internal/service"
 	"github.com/labstack/echo/v4"
 )
 
 type HealthHandler struct {
-	identityClient *client.IdentityClient
+	healthService *service.HealthService
 }
 
 func NewHealthHandler(
-	identityClient *client.IdentityClient,
+	healthService *service.HealthService,
 ) *HealthHandler {
 	return &HealthHandler{
-		identityClient: identityClient,
+		healthService: healthService,
 	}
 }
 
 func (h *HealthHandler) Health(c echo.Context) error {
-
-	resp, err := h.identityClient.Client.HealthCheck(
-		c.Request().Context(),
-		&identityv1.HealthCheckRequest{},
-	)
-
+	status, err := h.healthService.Check(c.Request().Context())
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
@@ -40,7 +33,7 @@ func (h *HealthHandler) Health(c echo.Context) error {
 	return c.JSON(
 		http.StatusOK,
 		map[string]string{
-			"status": resp.Status,
+			"status": status,
 		},
 	)
 }
