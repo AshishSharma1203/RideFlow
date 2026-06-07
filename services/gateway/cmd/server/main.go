@@ -9,72 +9,37 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/labstack/echo/v4"
-
-	"github.com/ashishSharma1203/rideflow/services/gateway/internal/client"
-	"github.com/ashishSharma1203/rideflow/services/gateway/internal/handler"
-	"github.com/ashishSharma1203/rideflow/services/gateway/internal/service"
+	"github.com/ashishSharma1203/rideflow/services/gateway/internal/app"
 )
 
 func main() {
-
-	e := echo.New()
 
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
 		syscall.SIGTERM,
 	)
-
 	defer stop()
 
-	identityClient, err := client.NewIdentityClient()
+	app, err := app.New()
 	if err != nil {
-		log.Fatalf("identity client error: %v", err)
+		log.Fatal(err)
 	}
 
-	healthService := service.NewHealthService(identityClient)
-
-	healthHandler := handler.NewHealthHandler(
-		healthService,
-	)
-
-	e.GET(
-		"/health",
-		healthHandler.Health,
-	)
-
-	log.Println("gateway listening on :8080")
-
 	go func() {
-
-		if err := e.Start(":8080"); err != nil &&
-			err != http.ErrServerClosed {
-
+		if err := app.Start(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("echo start error: %v", err)
 		}
-
 	}()
 
 	<-ctx.Done()
 
-	log.Println("shutdown signal received")
-	shutdownCtx, cancel := context.WithTimeout(
-		context.Background(),
-		10*time.Second,
-	)
-
+	shutdownCtx, cancel :=
+		context.WithTimeout(
+			context.Background(),
+			10*time.Second,
+		)
 	defer cancel()
 
-	if err := e.Shutdown(shutdownCtx); err != nil {
-		log.Printf("echo shutdown error: %v", err)
-	}
-	if err := identityClient.Conn.Close(); err != nil {
-		log.Printf(
-			"identity grpc close error: %v",
-			err,
-		)
-	}
-
-	log.Println("gateway stopped")
+	app.Shutdown(shutdownCtx)
 }
