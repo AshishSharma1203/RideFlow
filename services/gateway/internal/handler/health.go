@@ -1,20 +1,20 @@
 package handler
 
 import (
-	"context"
 	"net/http"
 
 	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
+	"github.com/ashishSharma1203/rideflow/services/gateway/internal/client"
 
 	"github.com/labstack/echo/v4"
 )
 
 type HealthHandler struct {
-	identityClient identityv1.IdentityServiceClient
+	identityClient *client.IdentityClient
 }
 
 func NewHealthHandler(
-	identityClient identityv1.IdentityServiceClient,
+	identityClient *client.IdentityClient,
 ) *HealthHandler {
 	return &HealthHandler{
 		identityClient: identityClient,
@@ -23,8 +23,8 @@ func NewHealthHandler(
 
 func (h *HealthHandler) Health(c echo.Context) error {
 
-	resp, err := h.identityClient.HealthCheck(
-		context.Background(),
+	resp, err := h.identityClient.Client.HealthCheck(
+		c.Request().Context(),
 		&identityv1.HealthCheckRequest{},
 	)
 

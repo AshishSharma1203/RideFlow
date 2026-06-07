@@ -7,7 +7,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func NewIdentityClient() (identityv1.IdentityServiceClient, error) {
+type IdentityClient struct {
+	Client identityv1.IdentityServiceClient
+	Conn   *grpc.ClientConn
+}
+
+func NewIdentityClient() (*IdentityClient, error) {
 
 	conn, err := grpc.NewClient(
 		"localhost:50051",
@@ -19,5 +24,8 @@ func NewIdentityClient() (identityv1.IdentityServiceClient, error) {
 		return nil, err
 	}
 
-	return identityv1.NewIdentityServiceClient(conn), nil
+	return &IdentityClient{
+		Client: identityv1.NewIdentityServiceClient(conn),
+		Conn:   conn,
+	}, nil
 }
