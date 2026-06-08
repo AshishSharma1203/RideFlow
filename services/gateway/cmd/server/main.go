@@ -27,7 +27,9 @@ func main() {
 	}
 
 	go func() {
-		if err := app.Start(); err != nil && err != http.ErrServerClosed {
+		if err := app.Start(); err != nil &&
+			err != http.ErrServerClosed {
+
 			log.Fatalf("echo start error: %v", err)
 		}
 	}()
