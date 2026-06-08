@@ -5,6 +5,7 @@ import (
 	"net"
 
 	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/service"
 	transportgrpc "github.com/ashishSharma1203/rideflow/services/identity/internal/transport/grpc"
 
 	"google.golang.org/grpc"
@@ -18,9 +19,11 @@ func main() {
 
 	server := grpc.NewServer()
 
+	identityService := service.NewIdentityService()
+
 	identityv1.RegisterIdentityServiceServer(
 		server,
-		transportgrpc.NewServer(),
+		transportgrpc.NewServer(identityService),
 	)
 
 	log.Println("identity service listening on :50051")

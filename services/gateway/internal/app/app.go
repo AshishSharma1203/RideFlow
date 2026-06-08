@@ -22,38 +22,39 @@ type App struct {
 
 func New() (*App, error) {
 	e := echo.New()
-	identityClient,err:=client.NewIdentityClient()
-	if(err!=nil){
-		return nil,err;
+	identityClient, err := client.NewIdentityClient()
+	if err != nil {
+		return nil, err
 	}
-	healthService:=service.NewHealthService(identityClient)
-	healthHandler:=handler.NewHealthHandler(healthService)
-	  app := &App{
-        Echo: e,
+	healthService := service.NewHealthService(identityClient)
+	healthHandler := handler.NewHealthHandler(healthService)
 
-        IdentityClient: identityClient,
+	app := &App{
+		Echo: e,
 
-        HealthService: healthService,
+		IdentityClient: identityClient,
 
-        HealthHandler: healthHandler,
-    }
+		HealthService: healthService,
 
-    app.registerRoutes()
+		HealthHandler: healthHandler,
+	}
 
-    return app, nil
+	app.registerRoutes()
+
+	return app, nil
 }
 
 func (a *App) Start() error {
-    return a.Echo.Start(":8080")
+	return a.Echo.Start(":8080")
 }
 
 func (a *App) Shutdown(
-    ctx context.Context,
+	ctx context.Context,
 ) error {
 
-    if err := a.Echo.Shutdown(ctx); err != nil {
-        return err
-    }
+	if err := a.Echo.Shutdown(ctx); err != nil {
+		return err
+	}
 
-    return a.IdentityClient.Conn.Close()
+	return a.IdentityClient.Conn.Close()
 }
