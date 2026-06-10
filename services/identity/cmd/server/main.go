@@ -5,6 +5,8 @@ import (
 	"net"
 
 	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
+
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/security/bcrypt"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/service"
 	transportgrpc "github.com/ashishSharma1203/rideflow/services/identity/internal/transport/grpc"
 
@@ -19,7 +21,12 @@ func main() {
 
 	server := grpc.NewServer()
 
-	identityService := service.NewIdentityService()
+	passwordHasher := bcrypt.NewHasher()
+
+	identityService :=
+		service.NewIdentityService(
+			passwordHasher,
+		)
 
 	identityv1.RegisterIdentityServiceServer(
 		server,
