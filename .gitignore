@@ -7,3 +7,5 @@ tmp/
 api/gen/
 
 *.log
+
+*.exe 
