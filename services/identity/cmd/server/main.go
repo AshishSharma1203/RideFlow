@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
 	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
 
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/config"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/security/bcrypt"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/service"
 	transportgrpc "github.com/ashishSharma1203/rideflow/services/identity/internal/transport/grpc"
@@ -14,9 +16,20 @@ import (
 )
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
+
+	// 1. Load and validate your configuration layout
+	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("listen error: %v", err)
+		log.Fatalf("failed to initialize configs: %v", err)
+	}
+
+	// 2. Format the int port into a valid address string (e.g., ":50051")
+	addr := fmt.Sprintf(":%d", cfg.GRPCPort)
+
+	// 3. Pass the string address to net.Listen
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatalf("listen error on address %s: %v", addr, err)
 	}
 
 	server := grpc.NewServer()
