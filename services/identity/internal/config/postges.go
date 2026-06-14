@@ -26,6 +26,10 @@ func (p PostgresConfig) Validate() error {
 	if p.Database == "" {
 		return fmt.Errorf("postgres database must not be empty")
 	}
+	
+	if p.Password == "" {
+		return fmt.Errorf("postgres password must not be empty")
+	}
 
 	return nil
 }
