@@ -24,7 +24,7 @@ func main() {
 	}
 
 	// 2. Format the int port into a valid address string (e.g., ":50051")
-	addr := fmt.Sprintf(":%d", cfg.GRPCPort)
+	addr := fmt.Sprintf(":%d", cfg.Server.GRPCPort)
 
 	// 3. Pass the string address to net.Listen
 	lis, err := net.Listen("tcp", addr)
