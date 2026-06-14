@@ -8,9 +8,9 @@ const (
 	EnvBcryptCost = "IDENTITY_BCRYPT_COST"
 
 	// Database
-	EnvPostgresHost     = "IDENTITY_POSTGRES_HOST"
-	EnvPostgresPort     = "IDENTITY_POSTGRES_PORT"
-	EnvPostgresUser     = "IDENTITY_POSTGRES_USER"
-	EnvPostgresPassword = "IDENTITY_POSTGRES_PASSWORD"
-	EnvPostgresDatabase = "IDENTITY_POSTGRES_DATABASE"
+	EnvPostgresHost     = "POSTGRES_HOST"
+	EnvPostgresPort     = "POSTGRES_PORT"
+	EnvPostgresUser     = "POSTGRES_USER"
+	EnvPostgresPassword = "POSTGRES_PASSWORD"
+	EnvPostgresDatabase = "POSTGRES_DATABASE"
 )

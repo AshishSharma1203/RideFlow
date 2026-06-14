@@ -7,6 +7,7 @@ import (
 
 	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
 
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/database"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/config"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/security/bcrypt"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/service"
@@ -22,6 +23,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to initialize configs: %v", err)
 	}
+
+	db, err := database.New(cfg.Postgres)
+	if err != nil {
+		log.Fatalf("failed to initialize postgres: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("postgres close error: %v", err)
+		}
+	}()
 
 	// 2. Format the int port into a valid address string (e.g., ":50051")
 	addr := fmt.Sprintf(":%d", cfg.Server.GRPCPort)
