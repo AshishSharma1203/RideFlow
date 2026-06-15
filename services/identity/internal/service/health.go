@@ -3,16 +3,19 @@ package service
 import (
 	"context"
 
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/security"
 )
 
 type IdentityService struct {
-	hasher security.PasswordHasher
+	userRepo repository.UserRepository
+	hasher   security.PasswordHasher
 }
 
-func NewIdentityService(hasher security.PasswordHasher) *IdentityService {
+func NewIdentityService(userRepo repository.UserRepository, hasher security.PasswordHasher) *IdentityService {
 	return &IdentityService{
-		hasher: hasher,
+		userRepo: userRepo,
+		hasher:   hasher,
 	}
 }
 

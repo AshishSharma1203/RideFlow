@@ -7,8 +7,10 @@ import (
 
 	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
 
-	"github.com/ashishSharma1203/rideflow/services/identity/internal/database"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/config"
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/database"
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository"
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository/sqlc"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/security/bcrypt"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/service"
 	transportgrpc "github.com/ashishSharma1203/rideflow/services/identity/internal/transport/grpc"
@@ -28,11 +30,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to initialize postgres: %v", err)
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Printf("postgres close error: %v", err)
-		}
-	}()
+
+	defer db.Close()
 
 	// 2. Format the int port into a valid address string (e.g., ":50051")
 	addr := fmt.Sprintf(":%d", cfg.Server.GRPCPort)
@@ -45,10 +44,17 @@ func main() {
 
 	server := grpc.NewServer()
 
-	passwordHasher := bcrypt.NewHasher()
+	queries := sqlc.New(db)
 
+	userRepo :=
+		repository.NewPostgresUserRepository(
+			queries,
+		)
+
+	passwordHasher := bcrypt.NewHasher()
 	identityService :=
 		service.NewIdentityService(
+			userRepo,
 			passwordHasher,
 		)
 
