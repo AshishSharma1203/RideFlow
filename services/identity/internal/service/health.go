@@ -3,9 +3,8 @@ package service
 import (
 	"context"
 	"errors"
-	"strings"
 
-	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
+	"github.com/ashishSharma1203/rideflow/services/identity/internal/dto"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/model"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/security"
@@ -27,37 +26,41 @@ func (s *IdentityService) HealthCheck(ctx context.Context) (string, error) {
 	return "ok", nil
 }
 
-func (s *IdentityService) RegisterUser(ctx context.Context, req *identityv1.RegisterUserRequest) (*model.User, error) {
-	username := strings.TrimSpace(req.GetUsername())
-	email := strings.TrimSpace(req.GetEmail())
-	password := req.GetPassword()
+func (s *IdentityService) RegisterUser(
+	ctx context.Context,
+	input dto.RegisterUserInput,
+) (*dto.RegisterUserOutput, error) {
+	input = normalizeRegisterUserInput(input)
 
-	if username == "" {
-		return nil, errors.New("username is required")
+	if err := validateRegisterUserInput(input); err != nil {
+		return nil, err
 	}
 
-	if !isValidEmail(email) {
-		return nil, errors.New("invalid email")
+	existingUser, err := s.userRepo.GetUserByEmail(ctx, input.Email)
+	if err == nil && existingUser != nil {
+		return nil, ErrEmailAlreadyExists
+	}
+	if err != nil && !errors.Is(err, repository.ErrUserNotFound) {
+		return nil, err
 	}
 
-	if password == "" {
-		return nil, errors.New("password is required")
-	}
-
-	hashedPassword, err := s.hasher.Hash(password)
+	hashedPassword, err := s.hasher.Hash(input.Password)
 	if err != nil {
 		return nil, err
 	}
 
 	userModel := model.User{
-		Username:     username,
-		Email:        email,
+		Username:     input.Username,
+		Email:        input.Email,
 		PasswordHash: hashedPassword,
 	}
 
-	return s.userRepo.CreateUser(ctx, &userModel)
-}
+	createdUser, err := s.userRepo.CreateUser(ctx, &userModel)
+	if err != nil {
+		return nil, err
+	}
 
-func isValidEmail(email string) bool {
-	return email != ""
+	return &dto.RegisterUserOutput{
+		UserID: createdUser.ID,
+	}, nil
 }
