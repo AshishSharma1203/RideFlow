@@ -6,13 +6,23 @@ option go_package = "github.com/ashishSharma1203/rideflow/api/gen/identity/v1;id
 
 import "google/api/annotations.proto";
 
+// IdentityService provides methods related to user identity and authentication.
 service IdentityService {
 
+  //HealthCheck is a simple method to check the health of the service. It can be used by monitoring tools to ensure that the service is running and responsive.
   rpc HealthCheck(HealthCheckRequest)
       returns (HealthCheckResponse) {
 
     option (google.api.http) = {
       get: "/health"
+    };
+  }
+
+  // RegisterUser is a method to register a new user. It accepts a RegisterUserRequest message containing the user's details and returns a RegisterUserResponse message with the result of the registration process.
+  rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users/register"
+      body: "*"
     };
   }
 }
@@ -21,4 +31,14 @@ message HealthCheckRequest {}
 
 message HealthCheckResponse {
   string status = 1;
+}
+
+message RegisterUserRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message RegisterUserResponse {
+  string user_id = 1;
 }

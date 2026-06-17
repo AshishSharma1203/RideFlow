@@ -46,14 +46,20 @@ func (r *PostgresUserRepository) GetUserByEmail(
 	return mapSqlUserToModelUser(user), nil
 }
 
-func (r *PostgresUserRepository) CreateUser(ctx context.Context, user *model.User) error {
-	// params := sqlc.CreateUserParams{
-	// 	Name:         user.Name,
-	// 	Email:        user.Email,
-	// 	PasswordHash: user.Password,
-	// }
-	// return r.queries.CreateUser(ctx, params)
-	return nil
+func (r *PostgresUserRepository) CreateUser(
+	ctx context.Context,
+	user *model.User,
+) (*model.User, error) {
+	createdUser, err := r.queries.CreateUser(ctx, sqlc.CreateUserParams{
+		Username:     user.Username,
+		Email:        user.Email,
+		PasswordHash: user.PasswordHash,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return mapSqlUserToModelUser(createdUser), nil
 }
 
 func mapSqlUserToModelUser(
@@ -62,7 +68,7 @@ func mapSqlUserToModelUser(
 
 	return &model.User{
 		ID:           sqlUser.ID.String(),
-		Name:         sqlUser.Name,
+		Username:     sqlUser.Username,
 		Email:        sqlUser.Email,
 		PasswordHash: sqlUser.PasswordHash,
 	}

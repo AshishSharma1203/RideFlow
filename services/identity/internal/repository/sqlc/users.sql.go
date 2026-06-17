@@ -20,21 +20,21 @@ VALUES (
     $2,
     $3
 )
-RETURNING id, name, email, password_hash, created_at, updated_at
+RETURNING id, name AS username, email, password_hash, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Name         string `json:"name"`
+	Username     string `json:"username"`
 	Email        string `json:"email"`
 	PasswordHash string `json:"password_hash"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Email, arg.PasswordHash)
+	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.Email, arg.PasswordHash)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.Username,
 		&i.Email,
 		&i.PasswordHash,
 		&i.CreatedAt,
@@ -44,7 +44,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, password_hash, created_at, updated_at
+SELECT id, name AS username, email, password_hash, created_at, updated_at
 FROM users
 WHERE email = $1
 `
@@ -54,7 +54,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.Username,
 		&i.Email,
 		&i.PasswordHash,
 		&i.CreatedAt,

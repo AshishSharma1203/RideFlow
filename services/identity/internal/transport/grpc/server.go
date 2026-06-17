@@ -33,3 +33,13 @@ func (s *Server) HealthCheck(
 		Status: res,
 	}, nil
 }
+
+func (s *Server) RegisterUser(ctx context.Context, req *identityv1.RegisterUserRequest) (*identityv1.RegisterUserResponse, error) {
+	res, err := s.identityService.RegisterUser(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return &identityv1.RegisterUserResponse{
+		UserId: res.ID,
+	}, nil
+}
