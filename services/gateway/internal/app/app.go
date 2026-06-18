@@ -15,9 +15,11 @@ type App struct {
 
 	IdentityClient *client.IdentityClient
 
-	HealthService *service.HealthService
+	HealthService   *service.HealthService
+	IdentityService *service.IdentityService
 
-	HealthHandler *handler.HealthHandler
+	HealthHandler   *handler.HealthHandler
+	IdentityHandler *handler.UserHandler
 }
 
 func New() (*App, error) {
@@ -27,16 +29,20 @@ func New() (*App, error) {
 		return nil, err
 	}
 	healthService := service.NewHealthService(identityClient)
+	identityService := service.NewIdentityService(identityClient)
 	healthHandler := handler.NewHealthHandler(healthService)
+	identityHandler := handler.NewIdentityHandler(identityService)
 
 	app := &App{
 		Echo: e,
 
 		IdentityClient: identityClient,
 
-		HealthService: healthService,
+		HealthService:   healthService,
+		IdentityService: identityService,
 
-		HealthHandler: healthHandler,
+		HealthHandler:   healthHandler,
+		IdentityHandler: identityHandler,
 	}
 
 	app.registerRoutes()
