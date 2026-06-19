@@ -13,4 +13,9 @@ const (
 	EnvPostgresUser     = "POSTGRES_USER"
 	EnvPostgresPassword = "POSTGRES_PASSWORD"
 	EnvPostgresDatabase = "POSTGRES_DATABASE"
+
+	// JWT
+	EnvJWTSecretKey              = "JWT_SECRET_KEY"
+	EnvJWTAccessTokenExpiration  = "JWT_ACCESS_TOKEN_EXPIRATION"
+	EnvJWTRefreshTokenExpiration = "JWT_REFRESH_TOKEN_EXPIRATION"
 )

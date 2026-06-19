@@ -12,6 +12,7 @@ import (
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository/sqlc"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/security/bcrypt"
+	identityjwt "github.com/ashishSharma1203/rideflow/services/identity/internal/security/jwt"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/service"
 	transportgrpc "github.com/ashishSharma1203/rideflow/services/identity/internal/transport/grpc"
 
@@ -52,10 +53,16 @@ func main() {
 		)
 
 	passwordHasher := bcrypt.NewHasher()
+	tokenManager := identityjwt.NewJWTMaker(
+		cfg.JWT.SecretKey,
+		cfg.JWT.AccessTokenExpiration,
+		cfg.JWT.RefreshTokenExpiration,
+	)
 	identityService :=
 		service.NewIdentityService(
 			userRepo,
 			passwordHasher,
+			tokenManager,
 		)
 
 	identityv1.RegisterIdentityServiceServer(

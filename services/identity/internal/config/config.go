@@ -1,11 +1,15 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Config struct {
 	Server   ServerConfig
 	Security SecurityConfig
 	Postgres PostgresConfig
+	JWT      JWTConfig
 }
 
 type ServerConfig struct {
@@ -14,6 +18,12 @@ type ServerConfig struct {
 
 type SecurityConfig struct {
 	BcryptCost int
+}
+
+type JWTConfig struct {
+	SecretKey              string
+	AccessTokenExpiration  time.Duration
+	RefreshTokenExpiration time.Duration
 }
 
 func (c Config) Validate() error {
@@ -26,6 +36,10 @@ func (c Config) Validate() error {
 	}
 
 	if err := c.Postgres.Validate(); err != nil {
+		return err
+	}
+
+	if err := c.JWT.Validate(); err != nil {
 		return err
 	}
 
@@ -43,6 +57,20 @@ func (s ServerConfig) Validate() error {
 func (s SecurityConfig) Validate() error {
 	if s.BcryptCost < 4 || s.BcryptCost > 31 {
 		return fmt.Errorf("bcrypt cost %d out of legal security bounds", s.BcryptCost)
+	}
+
+	return nil
+}
+
+func (j JWTConfig) Validate() error {
+	if j.SecretKey == "" {
+		return fmt.Errorf("jwt secret key must not be empty")
+	}
+	if j.AccessTokenExpiration <= 0 {
+		return fmt.Errorf("jwt access token expiration must be greater than 0")
+	}
+	if j.RefreshTokenExpiration <= 0 {
+		return fmt.Errorf("jwt refresh token expiration must be greater than 0")
 	}
 
 	return nil

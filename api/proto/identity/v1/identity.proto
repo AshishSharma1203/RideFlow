@@ -25,8 +25,16 @@ service IdentityService {
       body: "*"
     };
   }
+
+  //LoginUser is a method to authenticate a user. It accepts a LoginUserRequest message containing the user's email and password, and returns a LoginUserResponse message with the authenticated user's details and tokens if the authentication is successful.
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/users/login"
+      body: "*"
+    };
 }
 
+}
 message HealthCheckRequest {}
 
 message HealthCheckResponse {
@@ -41,4 +49,21 @@ message RegisterUserRequest {
 
 message RegisterUserResponse {
   string user_id = 1;
+}
+
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginUserResponse {
+  User user = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
 }

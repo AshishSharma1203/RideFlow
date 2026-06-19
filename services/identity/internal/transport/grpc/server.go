@@ -52,6 +52,26 @@ func (s *Server) RegisterUser(ctx context.Context, req *identityv1.RegisterUserR
 	}, nil
 }
 
+func (s *Server) LoginUser(ctx context.Context, req *identityv1.LoginUserRequest) (*identityv1.LoginUserResponse, error) {
+	res, err := s.identityService.LoginUser(ctx, dto.LoginUserInput{
+		Email:    req.GetEmail(),
+		Password: req.GetPassword(),
+	})
+
+	if err != nil {
+		return nil, mapLoginUserError(err)
+	}
+	return &identityv1.LoginUserResponse{
+		User: &identityv1.User{
+			Id:       res.ID,
+			Username: res.Username,
+			Email:    res.Email,
+		},
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+	}, nil
+}
+
 func mapRegisterUserError(err error) error {
 	switch {
 	case errors.Is(err, service.ErrInvalidUsername),
@@ -60,6 +80,18 @@ func mapRegisterUserError(err error) error {
 		return status.Error(codes.InvalidArgument, err.Error())
 	case errors.Is(err, service.ErrEmailAlreadyExists):
 		return status.Error(codes.AlreadyExists, err.Error())
+	default:
+		return status.Error(codes.Internal, "internal server error")
+	}
+}
+
+func mapLoginUserError(err error) error {
+	switch {
+	case errors.Is(err, service.ErrInvalidEmail),
+		errors.Is(err, service.ErrInvalidPassword):
+		return status.Error(codes.InvalidArgument, err.Error())
+	case errors.Is(err, service.ErrUserNotFound):
+		return status.Error(codes.NotFound, err.Error())
 	default:
 		return status.Error(codes.Internal, "internal server error")
 	}

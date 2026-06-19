@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -19,6 +20,10 @@ func Load() (*Config, error) {
 	postgresUser := os.Getenv(EnvPostgresUser)
 	postgresPassword := os.Getenv(EnvPostgresPassword)
 	postgresDatabase := os.Getenv(EnvPostgresDatabase)
+
+	jwtSecretKey := os.Getenv(EnvJWTSecretKey)
+	jwtAccessTokenExpirationStr := os.Getenv(EnvJWTAccessTokenExpiration)
+	jwtRefreshTokenExpirationStr := os.Getenv(EnvJWTRefreshTokenExpiration)
 
 	grpcPort, err := strconv.Atoi(grpcPortStr)
 	if err != nil {
@@ -50,6 +55,26 @@ func Load() (*Config, error) {
 		)
 	}
 
+	jwtAccessTokenExpiration, err := time.ParseDuration(jwtAccessTokenExpirationStr)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"invalid %s '%s': %w",
+			EnvJWTAccessTokenExpiration,
+			jwtAccessTokenExpirationStr,
+			err,
+		)
+	}
+
+	jwtRefreshTokenExpiration, err := time.ParseDuration(jwtRefreshTokenExpirationStr)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"invalid %s '%s': %w",
+			EnvJWTRefreshTokenExpiration,
+			jwtRefreshTokenExpirationStr,
+			err,
+		)
+	}
+
 	cfg := &Config{
 		Server: ServerConfig{
 			GRPCPort: grpcPort,
@@ -63,6 +88,11 @@ func Load() (*Config, error) {
 			User:     postgresUser,
 			Password: postgresPassword,
 			Database: postgresDatabase,
+		},
+		JWT: JWTConfig{
+			SecretKey:            jwtSecretKey,
+			AccessTokenExpiration: jwtAccessTokenExpiration,
+			RefreshTokenExpiration: jwtRefreshTokenExpiration,
 		},
 	}
 

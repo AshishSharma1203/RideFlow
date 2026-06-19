@@ -11,14 +11,16 @@ import (
 )
 
 type IdentityService struct {
-	userRepo repository.UserRepository
-	hasher   security.PasswordHasher
+	userRepo     repository.UserRepository
+	hasher       security.PasswordHasher
+	tokenManager security.TokenManager
 }
 
-func NewIdentityService(userRepo repository.UserRepository, hasher security.PasswordHasher) *IdentityService {
+func NewIdentityService(userRepo repository.UserRepository, hasher security.PasswordHasher, tokenManager security.TokenManager) *IdentityService {
 	return &IdentityService{
-		userRepo: userRepo,
-		hasher:   hasher,
+		userRepo:     userRepo,
+		hasher:       hasher,
+		tokenManager: tokenManager,
 	}
 }
 
@@ -62,5 +64,37 @@ func (s *IdentityService) RegisterUser(
 
 	return &dto.RegisterUserOutput{
 		UserID: createdUser.ID,
+	}, nil
+}
+
+func (s *IdentityService) LoginUser(ctx context.Context, user dto.LoginUserInput) (*dto.LoginUserOutput, error) {
+	if !isValidEmailFormat(user.Email) {
+		return nil, ErrInvalidEmail
+	}
+	userModel, err := s.userRepo.GetUserByEmail(ctx, user.Email)
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+
+	if err := s.hasher.Compare(userModel.PasswordHash, user.Password); err != nil {
+		return nil, ErrInvalidPassword
+	}
+
+	accessToken, err := s.tokenManager.GenerateAccessToken(userModel.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := s.tokenManager.GenerateRefreshToken(userModel.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.LoginUserOutput{
+		ID:           userModel.ID,
+		Username:     userModel.Username,
+		Email:        userModel.Email,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}, nil
 }
