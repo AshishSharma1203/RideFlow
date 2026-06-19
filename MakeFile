@@ -1,5 +1,6 @@
-.PHONY: proto
+.PHONY: proto sqlc remove_tmp_files docker-up docker-down docker-restart docker-logs docker-reset migration-up migration-down
 
+# --- Code Generation ---
 proto:
 	buf generate
 
@@ -9,11 +10,31 @@ sqlc:
 remove_tmp_files:
 	git clean -fd -- .tmp    
 
+# --- Docker Management ---
+# Start containers in background
 docker-up:
-	docker compose -f docker-compose.dev.yml up -d
+	docker compose -f docker-compose.yml up -d
 
+# Stop containers safely (keeps data volumes)
+docker-down:
+	docker compose -f docker-compose.yml down
+
+# Restart containers quickly
+docker-restart:
+	docker compose -f docker-compose.yml restart
+
+# Tail live logs from your database container
+docker-logs:
+	docker compose -f docker-compose.yml logs -f postgres
+
+# Nuke everything: stops containers, deletes data volumes, and forces a clean reset
+docker-reset:
+	docker compose -f docker-compose.yml down -v
+	docker compose -f docker-compose.yml up -d --build
+
+# --- Database Migrations ---
 migration-up:
-	docker compose -f docker-compose.dev.yml exec -T db sh -c "goose -dir /migrations postgres \"host=localhost port=5432 user=postgres password=postgres dbname=rideflow sslmode=disable\" up"
+	docker compose -f docker-compose.yml exec -T postgres sh -c "goose -dir /migrations postgres \"host=localhost port=5432 user=rideflow password=rideflow dbname=rideflow sslmode=disable\" up"
 
 migration-down:
-	docker compose -f docker-compose.dev.yml exec -T db sh -c "goose -dir /migrations postgres \"host=localhost port=5432 user=postgres password=postgres dbname=rideflow sslmode=disable\" down"
+	docker compose -f docker-compose.yml exec -T postgres sh -c "goose -dir /migrations postgres \"host=localhost port=5432 user=rideflow password=rideflow dbname=rideflow sslmode=disable\" down"

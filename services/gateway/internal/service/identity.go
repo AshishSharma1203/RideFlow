@@ -17,6 +17,20 @@ type RegisterUserOutput struct {
 	UserID string
 }
 
+type LoginUserInput struct {
+	Email    string
+	Password string
+}
+
+type LoginUserOutput struct {
+	ID           string
+	Email        string
+	Name         string
+	AccessToken  string
+	ExpiresAt    int64
+	RefreshToken string
+}
+
 type IdentityService struct {
 	identityClient *client.IdentityClient
 }
@@ -45,5 +59,29 @@ func (s *IdentityService) RegisterUser(
 
 	return &RegisterUserOutput{
 		UserID: resp.GetUserId(),
+	}, nil
+}
+
+func (s *IdentityService) LoginUser(
+	ctx context.Context,
+	input LoginUserInput,
+) (*LoginUserOutput, error) {
+	resp, err := s.identityClient.Client.LoginUser(
+		ctx,
+		&identityv1.LoginUserRequest{
+			Email:    input.Email,
+			Password: input.Password,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LoginUserOutput{
+		ID:           resp.GetUser().GetId(),
+		Name:         resp.GetUser().GetUsername(),
+		Email:        resp.GetUser().GetEmail(),
+		AccessToken:  resp.GetAccessToken(),
+		RefreshToken: resp.GetRefreshToken(),
 	}, nil
 }

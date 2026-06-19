@@ -8,7 +8,11 @@ func (a *App) registerRoutes() {
 	)
 
 	a.Echo.POST(
-		"/register",
+		"/users/register",
 		a.IdentityHandler.RegisterUser,
+	)
+	a.Echo.POST(
+		"/users/login",
+		a.IdentityHandler.LoginUser,
 	)
 }

@@ -15,6 +15,11 @@ type RegisterUserRequest struct {
 	Password string `json:"password"`
 }
 
+type LoginUserRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type UserHandler struct {
 	identityService *service.IdentityService
 }
@@ -54,6 +59,44 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 		http.StatusCreated,
 		map[string]string{
 			"user_id": res.UserID,
+		},
+	)
+}
+func (h *UserHandler) LoginUser(c echo.Context) error {
+	var req LoginUserRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(
+			http.StatusBadRequest,
+			map[string]string{
+				"error": "invalid request body",
+			},
+		)
+	}
+
+	res, err := h.identityService.LoginUser(c.Request().Context(), service.LoginUserInput{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err != nil {
+		return c.JSON(
+			httpStatusFromError(err),
+			map[string]string{
+				"error": userFacingError(err),
+			},
+		)
+	}
+
+	return c.JSON(
+		http.StatusOK,
+		map[string]interface{}{
+			"user": map[string]string{
+				"id":       res.ID,
+				"username": res.Name,
+				"email":    res.Email,
+			},
+			"access_token":  res.AccessToken,
+			"refresh_token": res.RefreshToken,
+			"expires_at":    res.ExpiresAt,
 		},
 	)
 }
