@@ -7,12 +7,13 @@ import (
 
 	identityv1 "github.com/ashishSharma1203/rideflow/api/gen/identity/v1"
 
+	authjwt "github.com/ashishSharma1203/rideflow/pkg/auth/jwt"
+
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/config"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/database"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository/sqlc"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/security/bcrypt"
-	identityjwt "github.com/ashishSharma1203/rideflow/services/identity/internal/security/jwt"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/service"
 	transportgrpc "github.com/ashishSharma1203/rideflow/services/identity/internal/transport/grpc"
 
@@ -53,7 +54,7 @@ func main() {
 		)
 
 	passwordHasher := bcrypt.NewHasher()
-	tokenManager := identityjwt.NewJWTMaker(
+	tokenManager := authjwt.NewJWTMaker(
 		cfg.JWT.SecretKey,
 		cfg.JWT.AccessTokenExpiration,
 		cfg.JWT.RefreshTokenExpiration,

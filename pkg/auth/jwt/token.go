@@ -3,7 +3,7 @@ package jwt
 import (
 	"time"
 
-	"github.com/ashishSharma1203/rideflow/services/identity/internal/security"
+	"github.com/ashishSharma1203/rideflow/pkg/auth"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -45,37 +45,37 @@ func (m *JWTMaker) generateToken(
 	return token.SignedString([]byte(m.secretKey))
 }
 
-func (m *JWTMaker) ValidateAccessToken(token string) (security.Claims, error) {
+func (m *JWTMaker) ValidateAccessToken(token string) (auth.Claims, error) {
 	return m.validateToken(token)
 }
 
-func (m *JWTMaker) ValidateRefreshToken(token string) (security.Claims, error) {
+func (m *JWTMaker) ValidateRefreshToken(token string) (auth.Claims, error) {
 	return m.validateToken(token)
 }
 
-func (m *JWTMaker) validateToken(token string) (security.Claims, error) {
+func (m *JWTMaker) validateToken(token string) (auth.Claims, error) {
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, security.ErrInvalidToken
+			return nil, auth.ErrInvalidToken
 		}
 		return []byte(m.secretKey), nil
 	})
 	if err != nil {
-		return security.Claims{}, err
+		return auth.Claims{}, err
 	}
 	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
 		userID, ok := claims["user_id"].(string)
 		if !ok {
-			return security.Claims{}, security.ErrInvalidToken
+			return auth.Claims{}, auth.ErrInvalidToken
 		}
 		expiry, ok := claims["exp"].(float64)
 		if !ok {
-			return security.Claims{}, security.ErrInvalidToken
+			return auth.Claims{}, auth.ErrInvalidToken
 		}
-		return security.Claims{
+		return auth.Claims{
 			UserID: userID,
 			Expiry: int64(expiry),
 		}, nil
 	}
-	return security.Claims{}, security.ErrInvalidToken
+	return auth.Claims{}, auth.ErrInvalidToken
 }

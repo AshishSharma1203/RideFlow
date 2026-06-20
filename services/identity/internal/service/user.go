@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-
+	"github.com/ashishSharma1203/rideflow/pkg/auth"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/dto"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/model"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/repository"
@@ -13,10 +13,10 @@ import (
 type IdentityService struct {
 	userRepo     repository.UserRepository
 	hasher       security.PasswordHasher
-	tokenManager security.TokenManager
+	tokenManager auth.TokenManager
 }
 
-func NewIdentityService(userRepo repository.UserRepository, hasher security.PasswordHasher, tokenManager security.TokenManager) *IdentityService {
+func NewIdentityService(userRepo repository.UserRepository, hasher security.PasswordHasher, tokenManager auth.TokenManager) *IdentityService {
 	return &IdentityService{
 		userRepo:     userRepo,
 		hasher:       hasher,

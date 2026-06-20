@@ -1,6 +1,8 @@
-package security
+package auth
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrInvalidToken = errors.New("invalid token")
