@@ -27,7 +27,6 @@ type LoginUserOutput struct {
 	Email        string
 	Name         string
 	AccessToken  string
-	ExpiresAt    int64
 	RefreshToken string
 }
 

@@ -36,5 +36,10 @@ docker-reset:
 migration-up:
 	docker compose -f docker-compose.yml exec -T postgres sh -c "goose -dir /migrations postgres \"host=localhost port=5432 user=rideflow password=rideflow dbname=rideflow sslmode=disable\" up"
 
+	migrate -path migrations -database "postgres://rideflow:rideflow@localhost:5432/rideflow?sslmode=disable" up  
+
 migration-down:
 	docker compose -f docker-compose.yml exec -T postgres sh -c "goose -dir /migrations postgres \"host=localhost port=5432 user=rideflow password=rideflow dbname=rideflow sslmode=disable\" down"
+
+migration-down:
+	migrate -path migrations -database "postgres://rideflow:rideflow@localhost:5432/rideflow?sslmode=disable" drop -f

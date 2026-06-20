@@ -96,7 +96,6 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 			},
 			"access_token":  res.AccessToken,
 			"refresh_token": res.RefreshToken,
-			"expires_at":    res.ExpiresAt,
 		},
 	)
 }
