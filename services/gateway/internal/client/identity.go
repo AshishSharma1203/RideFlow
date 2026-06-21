@@ -12,10 +12,10 @@ type IdentityClient struct {
 	Conn   *grpc.ClientConn
 }
 
-func NewIdentityClient() (*IdentityClient, error) {
+func NewIdentityClient(add string) (*IdentityClient, error) {
 
 	conn, err := grpc.NewClient(
-		"localhost:50051",
+		add,
 		grpc.WithTransportCredentials(
 			insecure.NewCredentials(),
 		),

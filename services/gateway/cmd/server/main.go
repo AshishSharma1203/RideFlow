@@ -10,10 +10,14 @@ import (
 	"time"
 
 	"github.com/ashishSharma1203/rideflow/services/gateway/internal/app"
+	"github.com/ashishSharma1203/rideflow/services/gateway/internal/config"
 )
 
 func main() {
-
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("failed to load the config :%v", err)
+	}
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
@@ -21,7 +25,7 @@ func main() {
 	)
 	defer stop()
 
-	app, err := app.New()
+	app, err := app.New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
