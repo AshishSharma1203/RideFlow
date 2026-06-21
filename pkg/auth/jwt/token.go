@@ -25,6 +25,12 @@ func NewJWTMaker(
 	}
 }
 
+func NewTokenValidator(secretKey string) *JWTMaker{
+	return &JWTMaker{
+		secretKey: secretKey,
+	}
+}
+
 func (m *JWTMaker) GenerateAccessToken(userID string) (string, error) {
 	return m.generateToken(userID, m.accessTokenExpiration)
 }
