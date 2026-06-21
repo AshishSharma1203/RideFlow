@@ -6,6 +6,8 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 
+	authjwt "github.com/ashishSharma1203/rideflow/pkg/auth/jwt"
+
 	"github.com/ashishSharma1203/rideflow/pkg/auth"
 	"github.com/ashishSharma1203/rideflow/services/gateway/internal/client"
 	"github.com/ashishSharma1203/rideflow/services/gateway/internal/config"
@@ -35,7 +37,7 @@ func New(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-	tokenValidator := auth.TokenValidator(cfg.JWT.SecretKey)
+	tokenValidator := authjwt.NewTokenValidator(cfg.JWT.SecretKey)
 	healthService := service.NewHealthService(identityClient)
 	identityService := service.NewIdentityService(identityClient)
 	healthHandler := handler.NewHealthHandler(healthService)
