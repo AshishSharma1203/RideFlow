@@ -6,7 +6,7 @@ type LoginUserInput struct {
 }
 
 type LoginUserOutput struct {
-	ID           string
+	UserID          string
 	Username     string
 	Email        string
 	AccessToken  string

@@ -7,6 +7,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type ProfileResponse struct {
+	UserID string `json:"user_id"`
+}
+
 type ProfileHandler struct {
 }
 
@@ -27,8 +31,8 @@ func (h *ProfileHandler) GetProfile(c echo.Context) error {
 
 	return c.JSON(
 		http.StatusOK,
-		map[string]string{
-			"user_id": claims.UserID,
+		ProfileResponse{
+			UserID: claims.UserID,
 		},
 	)
 }

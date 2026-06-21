@@ -15,9 +15,21 @@ type RegisterUserRequest struct {
 	Password string `json:"password"`
 }
 
+type RegisterUserResponse struct {
+	UserId string `json:"user_id"`
+}
+
 type LoginUserRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type LoginUserResponse struct {
+	UserID       string `json:"user_id"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type UserHandler struct {
@@ -35,8 +47,8 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(
 			http.StatusBadRequest,
-			map[string]string{
-				"error": "invalid request body",
+			ErrorResponse{
+				Error: "invalid request body",
 			},
 		)
 	}
@@ -49,16 +61,16 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 	if err != nil {
 		return c.JSON(
 			httpStatusFromError(err),
-			map[string]string{
-				"error": userFacingError(err),
+			ErrorResponse{
+				Error: userFacingError(err),
 			},
 		)
 	}
 
 	return c.JSON(
 		http.StatusCreated,
-		map[string]string{
-			"user_id": res.UserID,
+		RegisterUserResponse{
+			UserId: res.UserID,
 		},
 	)
 }
@@ -67,8 +79,8 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(
 			http.StatusBadRequest,
-			map[string]string{
-				"error": "invalid request body",
+			ErrorResponse{
+				Error: "invalid request body",
 			},
 		)
 	}
@@ -80,22 +92,20 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 	if err != nil {
 		return c.JSON(
 			httpStatusFromError(err),
-			map[string]string{
-				"error": userFacingError(err),
+			ErrorResponse{
+				Error: userFacingError(err),
 			},
 		)
 	}
 
 	return c.JSON(
 		http.StatusOK,
-		map[string]interface{}{
-			"user": map[string]string{
-				"id":       res.ID,
-				"username": res.Name,
-				"email":    res.Email,
-			},
-			"access_token":  res.AccessToken,
-			"refresh_token": res.RefreshToken,
+		LoginUserResponse{
+			UserID:       res.UserID,
+			Username:     res.Username,
+			Email:        res.Email,
+			AccessToken:  res.AccessToken,
+			RefreshToken: res.RefreshToken,
 		},
 	)
 }

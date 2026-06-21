@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+
 	"github.com/ashishSharma1203/rideflow/pkg/auth"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/dto"
 	"github.com/ashishSharma1203/rideflow/services/identity/internal/model"
@@ -91,7 +92,7 @@ func (s *IdentityService) LoginUser(ctx context.Context, user dto.LoginUserInput
 	}
 
 	return &dto.LoginUserOutput{
-		ID:           userModel.ID,
+		UserID:       userModel.ID,
 		Username:     userModel.Username,
 		Email:        userModel.Email,
 		AccessToken:  accessToken,

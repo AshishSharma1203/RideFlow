@@ -63,7 +63,7 @@ func (s *Server) LoginUser(ctx context.Context, req *identityv1.LoginUserRequest
 	}
 	return &identityv1.LoginUserResponse{
 		User: &identityv1.User{
-			Id:       res.ID,
+			Id:       res.UserID,
 			Username: res.Username,
 			Email:    res.Email,
 		},

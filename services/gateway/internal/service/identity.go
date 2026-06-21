@@ -23,9 +23,9 @@ type LoginUserInput struct {
 }
 
 type LoginUserOutput struct {
-	ID           string
+	UserID       string
+	Username     string
 	Email        string
-	Name         string
 	AccessToken  string
 	RefreshToken string
 }
@@ -77,8 +77,8 @@ func (s *IdentityService) LoginUser(
 	}
 
 	return &LoginUserOutput{
-		ID:           resp.GetUser().GetId(),
-		Name:         resp.GetUser().GetUsername(),
+		UserID:           resp.GetUser().GetId(),
+		Username:         resp.GetUser().GetUsername(),
 		Email:        resp.GetUser().GetEmail(),
 		AccessToken:  resp.GetAccessToken(),
 		RefreshToken: resp.GetRefreshToken(),

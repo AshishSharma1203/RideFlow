@@ -7,6 +7,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type HealthResponse struct {
+	Status string `json:"status"`
+}
+
 type HealthHandler struct {
 	healthService *service.HealthService
 }
@@ -24,16 +28,16 @@ func (h *HealthHandler) Health(c echo.Context) error {
 	if err != nil {
 		return c.JSON(
 			http.StatusInternalServerError,
-			map[string]string{
-				"error": err.Error(),
+			ErrorResponse{
+				Error: err.Error(),
 			},
 		)
 	}
 
 	return c.JSON(
 		http.StatusOK,
-		map[string]string{
-			"status": status,
+		HealthResponse{
+			Status: status,
 		},
 	)
 }
